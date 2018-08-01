@@ -9,6 +9,7 @@ const helper = {
 
   getAllPossibleArrays: function(nums) {    
     let allArrays = [];
+    let allArraysIndices = [];
 
     //~ Possible combination array (including all indices)
     let totalPossible = 2 ** nums.length;
@@ -21,34 +22,53 @@ const helper = {
     //~ Get combination based on running binary    
     arrOfBinary.forEach(str=>{
       let tempArr = [];
+      let indiceArr = []
 
       //~ if corresponding bit = 1, then the array will include that element and vice versa
       str.split('').forEach((bit,idx)=>{
         if ( bit === '1' ){
           tempArr.push(nums[idx]);
+          indiceArr.push(idx);
         }
       })
 
       //~ Get only combination array of indices = 3
       if ( tempArr.length === 3 ){
         allArrays.push(tempArr);
+        allArraysIndices.push(indiceArr)
       }
 
     })
 
-    return allArrays;
+    return {allArrays,allArraysIndices};
     
   },
 
-  getArraySumEqualToTarget: function(arrIn,target) {
-
+  //~ NOT USED NOW, keep for future if the values are needed
+  getArraySumEqualToTarget: function(objIn,target) {
+    let arrIn = objIn.allArrays
     let filterFn = function (arrIn){
       return arrIn[0]+arrIn[1]+arrIn[2] === target;
     }
 
     let filteredArray = arrIn.filter(filterFn);
-
     return filteredArray;
+  },
+
+  getIndicesSumEqualToTarget: function(objIn,target) {
+    let indices = []
+
+    objIn.allArrays.forEach((arr,idx) =>{
+      if (arr[0]+arr[1]+arr[2] === target){
+        indices.push(objIn.allArraysIndices[idx])
+      }
+    })
+
+    return indices;
+  },
+
+  getIndices: function(mainArray,subArray){
+    return subArray.map(arr => arr.map( e => mainArray.indexOf(e) ) );
 
   }
 
@@ -57,9 +77,14 @@ const helper = {
 const threeSum = (nums, target) => {
   // put your code here !!
   try{
-    let allArrays = helper.getAllPossibleArrays(nums);
-    let result = helper.getArraySumEqualToTarget(allArrays,target);
-    return result;
+    let allArraysObj = helper.getAllPossibleArrays(nums);
+
+    //~ If values are needed.
+    // let arrayOfElement = helper.getArraySumEqualToTarget(allArrays,target);
+
+    let indices = helper.getIndicesSumEqualToTarget(allArraysObj,target);
+
+    return indices;
   }catch(e){
     console.error(e);
     return [];
